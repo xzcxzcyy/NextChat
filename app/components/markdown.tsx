@@ -266,11 +266,35 @@ function tryWrapHtmlCode(text: string) {
       },
     );
 }
-
+//YK Begin
+function formatBoldText(text: string) {
+  const pattern = /\*\*(.*?)([:：])\*\*/g;
+  return text.replace(pattern, (match, boldText, colon) => {
+    return `**${boldText}**${colon}`;
+  });
+}
+function formatThinkText(text: string) {
+  const pattern = /^<think>([\s\S]*?)<\/think>/; // 匹配以 <think> 开头，且存在闭合 </think>
+  return text.replace(pattern, (match, thinkContent) => {
+    // 将 thinkContent 中的每一行开头添加 '>'
+    const formattedContent = thinkContent.split('\n').map((line: string) => `>${line}`).join('\n');
+    return `${formattedContent}\n`;
+  });
+}
+//YK End
 function _MarkDownContent(props: { content: string }) {
+  //YK Begin
+  //const escapedContent = useMemo(() => {
+  //  return tryWrapHtmlCode(escapeBrackets(props.content));
+  //}, [props.content]);
   const escapedContent = useMemo(() => {
-    return tryWrapHtmlCode(escapeBrackets(props.content));
+    return tryWrapHtmlCode(
+      formatThinkText(
+        formatBoldText(escapeBrackets(props.content)),
+      ),
+    );
   }, [props.content]);
+  //YK End
 
   return (
     <ReactMarkdown
